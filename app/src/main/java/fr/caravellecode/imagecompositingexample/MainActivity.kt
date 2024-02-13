@@ -14,14 +14,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import fr.caravellecode.imagecompositingexample.ui.theme.ImageCompositingExampleTheme
 
@@ -44,7 +49,11 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun ComposeImages(title: String, modifier: Modifier = Modifier) {
-    Column(modifier = Modifier.background(color = Color.LightGray)) {
+
+    var sizeInPx by remember { mutableStateOf(IntSize.Zero) }
+
+    Column(modifier = Modifier.background(color = Color.LightGray)
+        ) {
         Text(
             text = "$title!",
             modifier = modifier
@@ -54,16 +63,22 @@ fun ComposeImages(title: String, modifier: Modifier = Modifier) {
         val opaqueDetailsColor = Color.White
         val collarShapeVector = R.drawable.baseline_join_full_24
         val buttonsOutlineVector = R.drawable.outline_buttons_24
-        Box () {
+        Box (modifier = Modifier
+            .onGloballyPositioned {
+                sizeInPx = it.size
+            }) {
             Image(
                 painter = painterResource(id = baseImageBitmap),
                 contentDescription = "Base raster graphic image",
                 colorFilter = ColorFilter.tint(color = opaqueColor),
             )
+            val collarSize = 80.dp
+            val centerXOffset = sizeInPx.width.div(2).pxToDp().minus(collarSize/2)
+
             // lay atop more volume elements
             Image(
-                modifier = Modifier.offset(x = 150.dp, y = -25.dp)
-                    .size(80.dp)
+                modifier = Modifier.offset(x = centerXOffset, y = -25.dp)
+                    .size(collarSize)
                 ,
                 painter = painterResource(id = collarShapeVector),
                 contentDescription = "collar",
@@ -71,8 +86,8 @@ fun ComposeImages(title: String, modifier: Modifier = Modifier) {
             )
             // lay atop some outline elements
             Image(
-                modifier = Modifier.offset(x = 150.dp, y = 20.dp)
-                    .size(80.dp)
+                modifier = Modifier.offset(x = centerXOffset, y = 20.dp)
+                    .size(collarSize)
                 ,
                 painter = painterResource(id = buttonsOutlineVector),
                 contentDescription = "buttons",
@@ -82,9 +97,14 @@ fun ComposeImages(title: String, modifier: Modifier = Modifier) {
     }
 }
 
+@Composable
+fun Int.pxToDp() = with(LocalDensity.current) {
+    this@pxToDp.toDp()
+}
+
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
+fun ComposeImagesPreview() {
     ImageCompositingExampleTheme {
         ComposeImages("Preview")
     }
