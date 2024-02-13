@@ -20,6 +20,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -52,7 +53,7 @@ fun ComposeImages(title: String, modifier: Modifier = Modifier) {
 
     var sizeInPx by remember { mutableStateOf(IntSize.Zero) }
 
-    Column(modifier = Modifier.background(color = Color.LightGray)
+    Column(modifier = Modifier.background(color = Color(0xFFDFDFDF))
         ) {
         Text(
             text = "$title!",
@@ -68,16 +69,17 @@ fun ComposeImages(title: String, modifier: Modifier = Modifier) {
                 sizeInPx = it.size
             }) {
             Image(
+                modifier = Modifier.offset(x = 0.dp, y = 25.dp),
                 painter = painterResource(id = baseImageBitmap),
                 contentDescription = "Base raster graphic image",
-                colorFilter = ColorFilter.tint(color = opaqueColor),
+                colorFilter = ColorFilter.tint(color = opaqueColor.copy(alpha = 0.3f), blendMode = BlendMode.SrcAtop),
             )
             val collarSize = 80.dp
             val centerXOffset = sizeInPx.width.div(2).pxToDp().minus(collarSize/2)
 
             // lay atop more volume elements
             Image(
-                modifier = Modifier.offset(x = centerXOffset, y = -25.dp)
+                modifier = Modifier.offset(x = centerXOffset, y = 0.dp)
                     .size(collarSize)
                 ,
                 painter = painterResource(id = collarShapeVector),
@@ -86,7 +88,7 @@ fun ComposeImages(title: String, modifier: Modifier = Modifier) {
             )
             // lay atop some outline elements
             Image(
-                modifier = Modifier.offset(x = centerXOffset, y = 20.dp)
+                modifier = Modifier.offset(x = centerXOffset, y = 55.dp)
                     .size(collarSize)
                 ,
                 painter = painterResource(id = buttonsOutlineVector),
